@@ -1,31 +1,29 @@
-
+// ./client/src/context/GuitarReducer.js
 
 const reducer = (globalState, action) => {
     switch (action.type) {
-
-        case "GET_GUITARS":
+        case 'GET_GUITAR':
+        case 'UPDATE_GUITAR':
             return {
                 ...globalState,
-                guitars: action.payload //action = dispatch
-            }
-            
-        case "GET_GUITAR":
+                singleGuitar: action.payload,
+            };
+
+        case 'GET_GUITARS':
             return {
                 ...globalState,
-                singleGuitar: action.payload //action = dispatch
-            }
+                guitars: action.payload,
+            };
 
-        case "CHANGE_TEXT":
+        case 'CHANGE_TEXT':
             return {
                 ...globalState,
-                hola: action.payload //action = dispatch
-            }
-
-
+                hola: action.payload,
+            };
 
         default:
-            return globalState
+            return globalState;
     }
-}
+};
 
-export default reducer
+export default reducer;

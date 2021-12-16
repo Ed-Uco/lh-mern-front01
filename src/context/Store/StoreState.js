@@ -1,96 +1,104 @@
+// ./client/src/context/Guitar/GuitarState.js
 
-import { useReducer } from "react";
-import axiosClient from "../../config/axios";
-import StoreContext from "./StoreContext";
-import StoreReducer from "./StoreReducer"
+// ESTADO GLOBAL - STORE
+
+// LA ARQUITECTURA QUE SE UTILIZA PARA GENERAR EL ESTADO GLOBAL SE LE CONOCE COMO FLUX.
+
+import { useReducer } from 'react';
 
 
+import StoreReducer  from './StoreReducer'
 
+import axiosClient from './../../config/axios';
+import StoreContext from './StoreContext';
 
-const StoreState = (props) => {
-
-    //Todo lo que tenga que ver con Storeras se guarda en este estado global
-    //1.Initial State
-        //Que se ejecute en todos los componentes
+const StoreState = props => {
+    // 1. INITIAL STATE (ESTADO INICIAL)
     const initialState = {
         stores: [],
         singleStore: {
-            _id: "",
-            domicilio: "",
-            telefono: ""
+            _id: '',
+            domicilio: '',
+            telefono: '',
         },
-        mundo: "hola"
-    }
+        hola: 'mundo',
+    };
 
+    // 2. CONFIGURACIÓN DE REDUCER Y CREACIÓN DE ESTADO GLOBAL
+    // REDUCERS SON FUNCIONES QUE ALTERAN EL ESTADO GLOBAL
+    const [globalState, dispatch] = useReducer(StoreReducer, initialState);
 
-    //2. Config de reducer y creacion del estado global- uso del Hook
-    const [globalState, dispatch] = useReducer(StoreReducer, initialState)
-
-
-    //3.Funciones de cambio en estado Global
+    // 3. FUNCIONES DE CAMBIO EN ESTADO GLOBAL
     const changeText = () => {
-
-        //Este objeto se le conoce como action en Reducer
         dispatch({
-            type: "CHANGE_TEXT",
-            //datos reales que cambia el estado global
-            payload: "Estoy aprendiendo context sin morir stores!"
-        })
+            // ESTE OBJETO SE LE CONOCE COMO ACTION
+            type: 'CHANGE_TEXT',
+            payload: 'Estoy aprendiendo Context sin morir.',
+        });
+    };
 
-    }
+    const getStores = async () => {
+        const res = await axiosClient.get('stores/readall');
 
-    const getStores = async() => {
-        //console.log("Obteniendo Guitarras....") <-- al darle click en comp./guit/index
-        const res = await axiosClient.get("stores/readall")
-        console.log(res)
-		
-        const list = res.data.data
-        console.log(list) //[{…}] {_id: '61b797aabd996d48a49444bd', nombre: 'Guitarra Heroku', precio: 15000, color: 'Negra con blanco', imagen: 'http://...', …}
+        console.log('Obteniendo tiendas...');
 
-		dispatch({
-			type: "GET_STORES",
-			payload: list
-		})
-    }
+        const list = res.data.data;
+        console.log(list)
+        dispatch({
+            type: 'GET_STORES',
+            payload: list,
+        });
+    };
 
-    const getStore = async(storeId) => {
+    const getStore = async storeId => {
+        console.log(storeId);
 
-        const res = await axiosClient.get(`stores/readone/${storeId}`)
-        const selectedStore = res.data.data
+        const res = await axiosClient.get(`stores/readone/${storeId}`);
+
+        console.log(res);
+
+        const selectedStore = res.data.data;
 
         dispatch({
-            type: "GET_STORE",
-            payload: selectedStore
-        })
-    }
+            type: 'GET_STORE',
+            payload: selectedStore,
+        });
+    };
 
-    const createStoreFunction= async (form) => {
+    const createStore = async form => {
+        const res = await axiosClient.post('stores/create', form);
 
-		const res = await axiosClient.post("stores/create", form)
+        console.log(res);
+    };
 
-		console.log(res) // {data: {…}, status: 200, statusText: 'OK', headers: {…}, config: {…}, …}
+    const updateStore = async (form, idStore) => {
+        const res = await axiosClient.put(`stores/edit/${idStore}`, form);
 
-	}
+        const updatedStore = res.data.data;
 
-    //4. Retorno
+        dispatch({
+            type: 'UPDATE_STORE',
+            payload: updatedStore,
+        });
+    };
+
+    // 4. RETORNO
     return (
-        <StoreContext.Provider 
-        value={{
-            stores: globalState.stores,
-            mundo: globalState.mundo,
-            singleStore: globalState.singleStore,
-            changeText,
-            getStores,
-            getStore,
-            createStoreFunction
-        }} >
-                {/* Es la representacion de todos los componentes del router - Outlet(de estado global) */}
+        <StoreContext.Provider
+            value={{
+                stores: globalState.stores,
+                hola: globalState.hola,
+                singleStore: globalState.singleStore,
+                changeText,
+                getStores,
+                getStore,
+                createStore,
+                updateStore,
+            }}
+        >
             {props.children}
-
-
         </StoreContext.Provider>
-    )
+    );
+};
 
-}
-
-export default StoreState
+export default StoreState;

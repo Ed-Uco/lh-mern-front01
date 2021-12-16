@@ -1,11 +1,22 @@
-import React from 'react'
+// ./client/src/components/Home.js
+import React, { useContext } from 'react';
+import UserContext from '../context/User/UserContext';
 
-const Home = () => {
+export default function Home() {
+    const ctx = useContext(UserContext);
+
+    const { verifyingToken } = ctx;
+
     return (
         <div>
-            Este es el home
+            Este es el Home
+            <button
+                onClick={() => {
+                    verifyingToken();
+                }}
+            >
+                Verificar sesión
+            </button>
         </div>
-    )
+    );
 }
-
-export default Home
